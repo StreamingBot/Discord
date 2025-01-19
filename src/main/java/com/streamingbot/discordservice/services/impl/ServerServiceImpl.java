@@ -67,4 +67,19 @@ public class ServerServiceImpl implements ServerService {
         }
         serverRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteServersByUserId(String userId) {
+        logger.info("Deleting all servers for userId: {}", userId);
+        try {
+            List<Server> servers = serverRepository.findByUserId(userId);
+            logger.debug("Found {} servers to delete for userId: {}", servers.size(), userId);
+            
+            serverRepository.deleteByUserId(userId);
+            logger.info("Successfully deleted all servers for userId: {}", userId);
+        } catch (Exception e) {
+            logger.error("Failed to delete servers for userId: {}", userId, e);
+            throw new RuntimeException("Failed to delete servers: " + e.getMessage());
+        }
+    }
 } 

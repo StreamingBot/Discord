@@ -10,4 +10,5 @@ public interface ServerService {
     Server createServer(Server server);
     Server updateServer(Server server);
     void deleteServer(UUID id);
+    void deleteServersByUserId(String userId);
 } 
