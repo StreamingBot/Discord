@@ -17,9 +17,11 @@ public class CommandServiceImpl implements CommandService {
     
     private static final Logger logger = LoggerFactory.getLogger(CommandServiceImpl.class);
     private final CommandRepository commandRepository;
+    private final UUIDGeneratorImpl uuidGeneratorImpl;
 
-    public CommandServiceImpl(CommandRepository commandRepository) {
+    public CommandServiceImpl(CommandRepository commandRepository, UUIDGeneratorImpl uuidGeneratorImpl) {
         this.commandRepository = commandRepository;
+        this.uuidGeneratorImpl = uuidGeneratorImpl;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class CommandServiceImpl implements CommandService {
     @Override
     public Command createCommand(Command command) {
         if (command.getId() == null) {
-            command.setId(UUID.randomUUID());
+            command.setId(uuidGeneratorImpl.Generate());
         }
         return commandRepository.save(command);
     }

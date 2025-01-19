@@ -17,9 +17,12 @@ public class ServerServiceImpl implements ServerService {
     
     private static final Logger logger = LoggerFactory.getLogger(ServerServiceImpl.class);
     private final ServerRepository serverRepository;
+    private final UUIDGeneratorImpl uuidGeneratorImpl;
 
-    public ServerServiceImpl(ServerRepository serverRepository) {
+
+    public ServerServiceImpl(ServerRepository serverRepository, UUIDGeneratorImpl uuidGeneratorImpl) {
         this.serverRepository = serverRepository;
+        this.uuidGeneratorImpl = uuidGeneratorImpl;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class ServerServiceImpl implements ServerService {
     public Server createServer(Server server) {
         try {
             if (server.getId() == null) {
-                server.setId(UUID.randomUUID());
+                server.setId(uuidGeneratorImpl.Generate());
                 logger.info("Generated new UUID: {}", server.getId());
             }
             
