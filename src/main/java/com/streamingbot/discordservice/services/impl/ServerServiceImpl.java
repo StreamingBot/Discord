@@ -17,9 +17,12 @@ public class ServerServiceImpl implements ServerService {
     
     private static final Logger logger = LoggerFactory.getLogger(ServerServiceImpl.class);
     private final ServerRepository serverRepository;
+    private final UUIDGeneratorImpl uuidGeneratorImpl;
 
-    public ServerServiceImpl(ServerRepository serverRepository) {
+
+    public ServerServiceImpl(ServerRepository serverRepository, UUIDGeneratorImpl uuidGeneratorImpl) {
         this.serverRepository = serverRepository;
+        this.uuidGeneratorImpl = uuidGeneratorImpl;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class ServerServiceImpl implements ServerService {
     public Server createServer(Server server) {
         try {
             if (server.getId() == null) {
-                server.setId(UUID.randomUUID());
+                server.setId(uuidGeneratorImpl.Generate());
                 logger.info("Generated new UUID: {}", server.getId());
             }
             
@@ -66,5 +69,20 @@ public class ServerServiceImpl implements ServerService {
             throw new RuntimeException("Server not found with id: " + id);
         }
         serverRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteServersByUserId(String userId) {
+        logger.info("Deleting all servers for userId: {}", userId);
+        try {
+            List<Server> servers = serverRepository.findByUserId(userId);
+            logger.debug("Found {} servers to delete for userId: {}", servers.size(), userId);
+            
+            serverRepository.deleteByUserId(userId);
+            logger.info("Successfully deleted all servers for userId: {}", userId);
+        } catch (Exception e) {
+            logger.error("Failed to delete servers for userId: {}", userId, e);
+            throw new RuntimeException("Failed to delete servers: " + e.getMessage());
+        }
     }
 } 

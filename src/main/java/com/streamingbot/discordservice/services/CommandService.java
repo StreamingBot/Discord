@@ -7,8 +7,9 @@ import java.util.UUID;
 public interface CommandService {
     List<Command> getAllCommands();
     Command getCommandById(UUID id);
-    List<Command> getCommandsByServerId(UUID serverId);
+    List<Command> getCommandsByServerId(String serverId);
     Command createCommand(Command command);
     Command updateCommand(Command command);
     void deleteCommand(UUID id);
+    void deleteCommandsByUserId(String userId);
 } 

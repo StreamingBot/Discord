@@ -3,6 +3,8 @@ package com.streamingbot.discordservice.services.impl;
 import com.streamingbot.discordservice.models.Command;
 import com.streamingbot.discordservice.repositories.CommandRepository;
 import com.streamingbot.discordservice.services.CommandService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,10 +15,13 @@ import java.util.UUID;
 @Transactional
 public class CommandServiceImpl implements CommandService {
     
+    private static final Logger logger = LoggerFactory.getLogger(CommandServiceImpl.class);
     private final CommandRepository commandRepository;
+    private final UUIDGeneratorImpl uuidGeneratorImpl;
 
-    public CommandServiceImpl(CommandRepository commandRepository) {
+    public CommandServiceImpl(CommandRepository commandRepository, UUIDGeneratorImpl uuidGeneratorImpl) {
         this.commandRepository = commandRepository;
+        this.uuidGeneratorImpl = uuidGeneratorImpl;
     }
 
     @Override
@@ -31,14 +36,14 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public List<Command> getCommandsByServerId(UUID serverId) {
+    public List<Command> getCommandsByServerId(String serverId) {
         return commandRepository.findByServerId(serverId);
     }
 
     @Override
     public Command createCommand(Command command) {
         if (command.getId() == null) {
-            command.setId(UUID.randomUUID());
+            command.setId(uuidGeneratorImpl.Generate());
         }
         return commandRepository.save(command);
     }
@@ -57,5 +62,20 @@ public class CommandServiceImpl implements CommandService {
             throw new RuntimeException("Command not found");
         }
         commandRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteCommandsByUserId(String serverId) {
+        logger.info("Deleting all commands for userId: {}", serverId);
+        try {
+            List<Command> commands = commandRepository.findByServerId(serverId);
+            logger.debug("Found {} commands to delete for userId: {}", commands.size(), serverId);
+            
+            commandRepository.deleteByServerId(serverId);
+            logger.info("Successfully deleted all commands for userId: {}", serverId);
+        } catch (Exception e) {
+            logger.error("Failed to delete commands for userId: {}", serverId, e);
+            throw new RuntimeException("Failed to delete commands: " + e.getMessage());
+        }
     }
 } 

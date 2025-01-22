@@ -34,7 +34,7 @@ public class CommandController {
     }
 
     @GetMapping("/server/{serverId}")
-    public List<Command> getCommandsByServerId(@PathVariable UUID serverId) {
+    public List<Command> getCommandsByServerId(@PathVariable String serverId) {
         return commandService.getCommandsByServerId(serverId);
     }
 
